@@ -39,7 +39,10 @@ function askCustomer() {
 			var chosenId = parseInt(answer.id);
 			var idIndex = chosenId - 1;
 			var chosenUnits = parseInt(answer.units);
-			if(chosenUnits > products[idIndex].stock_quantity){
+			if(chosenUnits < products[idIndex].stock_quantity){
+				connection.query('UPDATE products SET stock_quantity=stock_quantity-' + chosenUnits + ' WHERE item_id=' + chosenId + ';')
+				console.log('Total price: $' + products[idIndex].price * chosenUnits);
+			} else {
 				console.log('Not enough stock!');
 			}
 		});
