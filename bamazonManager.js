@@ -28,19 +28,53 @@ function askManager() {
 	.then(function(answer) {
 		var taskChoice = answer.taskList;
 		if(taskChoice === 'Products for sale') {
-			connection.query('SELECT * FROM products ', function(err, res) {
-				if (err) throw err;
-				for(i = 0; i < res.length; i++) {
-					console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
-				};
-			});
+			viewInventory();
 		} else if(taskChoice === 'View low inventory') {
-			connection.query('SELECT * FROM products WHERE stock_quantity < 5', function(err, res) {
-				if (err) throw err;
-				for(i = 0; i < res.length; i++) {
-					console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
-				};
-			});			
+			lowInventory();
+		} else if(taskChoice === 'Add to inventory') {
+			addInventory();
 		}
 	});
+};
+
+function viewInventory() {
+	connection.query('SELECT * FROM products ', function(err, res) {
+		if (err) throw err;
+		for(i = 0; i < res.length; i++) {
+			console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
+		};
+	});
+}
+
+function lowInventory() {
+	connection.query('SELECT * FROM products WHERE stock_quantity < 5', function(err, res) {
+		if (err) throw err;
+		for(i = 0; i < res.length; i++) {
+			console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
+		};
+	});	
+}
+
+function addInventory() {
+	viewInventory();
+	inquirer
+	.prompt([
+		{
+			name: 'id',
+			message: 'Which ID do you want to add to?'
+		},
+		{
+			name: 'units',
+			message: 'How many units do you want to add?'
+		}
+	])
+	.then(function(answer) {
+		var chosenId = parseInt(answer.id);
+		var idIndex = chosenId - 1;
+		var chosenUnits = parseInt(answer.units);
+		connection.query('UPDATE products SET stock_quantity=stock_quantity+' + chosenUnits + ' WHERE item_id=' + chosenId + ';')
+		connection.query('SELECT stock_quantity FROM products WHERE item_id=' + chosenId + ';', function(err, res) {
+			console.log(res[0].stock_quantity);
+		});
+	});		
 };
