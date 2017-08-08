@@ -9,14 +9,17 @@ var connection = mysql.createConnection({
 	database: 'bamazon'
 });
 
+var products = [];
 connection.connect(function(err) {
 	if (err) throw err;
 	connection.query('SELECT * FROM products ', function(err, res) {
 		if (err) throw err;
 		for(i = 0; i < res.length; i++) {
 			console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name);
+			products.push(res[i]);
 		};
 		askCustomer();
+
 	});
 });
 
@@ -31,5 +34,13 @@ function askCustomer() {
 				name: 'units',
 				message: 'How many units do you want to buy?'
 			}
-		]);
+		])
+		.then(function(answer) {
+			var chosenId = parseInt(answer.id);
+			var idIndex = chosenId - 1;
+			var chosenUnits = parseInt(answer.units);
+			if(chosenUnits > products[idIndex].stock_quantity){
+				console.log('Not enough stock!');
+			}
+		});
 };
