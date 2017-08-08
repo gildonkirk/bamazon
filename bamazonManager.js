@@ -22,7 +22,7 @@ function askManager() {
 			name: 'taskList',
 			message: 'Choose an action',
 			type: 'list',
-			choices: ['Products for sale', 'View Low Inventory', 'Add to Inventory', 'Add new Product']
+			choices: ['Products for sale', 'View low inventory', 'Add to inventory', 'Add new product']
 		},
 	])
 	.then(function(answer) {
@@ -34,6 +34,13 @@ function askManager() {
 					console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
 				};
 			});
-		};
+		} else if(taskChoice === 'View low inventory') {
+			connection.query('SELECT * FROM products WHERE stock_quantity < 5', function(err, res) {
+				if (err) throw err;
+				for(i = 0; i < res.length; i++) {
+					console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
+				};
+			});			
+		}
 	});
 };
