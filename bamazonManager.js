@@ -33,6 +33,8 @@ function askManager() {
 			lowInventory();
 		} else if(taskChoice === 'Add to inventory') {
 			addInventory();
+		} else if(taskChoice === 'Add new product') {
+			addProduct();
 		}
 	});
 };
@@ -41,7 +43,7 @@ function viewInventory() {
 	connection.query('SELECT * FROM products ', function(err, res) {
 		if (err) throw err;
 		for(i = 0; i < res.length; i++) {
-			console.log('ID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
+			console.log('\nID: ' + res[i].item_id + ' | $' + res[i].price + ' ' + res[i].product_name + ' | Qty: ' + res[i].stock_quantity);
 		};
 	});
 }
@@ -74,7 +76,42 @@ function addInventory() {
 		var chosenUnits = parseInt(answer.units);
 		connection.query('UPDATE products SET stock_quantity=stock_quantity+' + chosenUnits + ' WHERE item_id=' + chosenId + ';')
 		connection.query('SELECT stock_quantity FROM products WHERE item_id=' + chosenId + ';', function(err, res) {
-			console.log(res[0].stock_quantity);
+			console.log('New stock quantity: ' + res[0].stock_quantity);
 		});
 	});		
 };
+
+function addProduct() {
+	inquirer
+	.prompt([
+		{
+			name: 'name',
+			message: 'Which is the product name?'
+		},
+		{
+			name: 'department',
+			message: 'What is the department name?'
+		},
+		{
+			name: 'price',
+			message: 'What is the price?'
+		},
+		{
+			name: 'quantity',
+			message: 'How much do we have in stock?'
+		}
+	])
+	.then(function(answer) {
+		connection.query(            
+			"INSERT INTO products SET ?",
+            [
+              {
+                product_name: answer.name,
+                department_name: answer.department,
+              	price: answer.price,
+              	stock_quantity: answer.quantity              	                
+              }
+            ]);
+	});		
+};
+
