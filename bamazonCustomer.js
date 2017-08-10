@@ -41,6 +41,7 @@ function askCustomer() {
 			var chosenUnits = parseInt(answer.units);
 			if(chosenUnits < products[idIndex].stock_quantity){
 				connection.query('UPDATE products SET stock_quantity=stock_quantity-' + chosenUnits + ' WHERE item_id=' + chosenId + ';')
+				connection.query('UPDATE products SET product_sales=' + products[idIndex].price * chosenUnits + ' WHERE item_id=' + chosenId + ';')
 				console.log('Total price: $' + products[idIndex].price * chosenUnits);
 			} else {
 				console.log('Not enough stock!');
